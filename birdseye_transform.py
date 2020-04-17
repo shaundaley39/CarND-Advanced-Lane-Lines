@@ -23,7 +23,7 @@ class BirdsEyeTransform:
     _m_inv = None
 
     def __init__(self, camera_calibration, straight_glob):
-        out_dir = "intermediate/"
+        # out_dir = "intermediate/"
         rho = 6
         theta = np.pi/180
         threshold = 200
@@ -45,11 +45,11 @@ class BirdsEyeTransform:
                                   (imshape[1], imshape[0])]], dtype=np.int32)
 
             # Visualize filtered points from undistorted image
-            color_binary = np.dstack(( np.zeros_like(binary_sobelx),
-                                      binary_sobelx, binary_s)) * 255
-            color_binary = region_of_interest(color_binary, vertices)
-            mpimg.imsave(out_dir + fname.split('/')[-1][:-4] + 
-                         "_t_filtered.jpg", color_binary)
+            # color_binary = np.dstack(( np.zeros_like(binary_sobelx),
+            #                           binary_sobelx, binary_s)) * 255
+            # color_binary = region_of_interest(color_binary, vertices)
+            # mpimg.imsave(out_dir + fname.split('/')[-1][:-4] +
+            #              "_t_filtered.jpg", color_binary)
 
             binary_combo = region_of_interest(binary_combo, vertices)
             lines = cv2.HoughLinesP(binary_combo, rho, theta, threshold,
@@ -57,9 +57,9 @@ class BirdsEyeTransform:
                                     minLineLength=min_line_len,
                                     maxLineGap=max_line_gap)
             # Visualize lines on undistorted image
-            draw_lines(image, lines)
-            mpimg.imsave(out_dir + fname.split('/')[-1][:-4] +
-                         "_t_filtered_lined.jpg", image)
+            # draw_lines(image, lines)
+            # mpimg.imsave(out_dir + fname.split('/')[-1][:-4] +
+            #              "_t_filtered_lined.jpg", image)
 
             # calculate transform
             i_left, i_right = lines_to_left_right(lines, imshape)
@@ -95,13 +95,13 @@ class BirdsEyeTransform:
                                             transformed_left,
                                             transformed_right))
             # Visualize transformed straight lane image
-            mpimg.imsave(out_dir + fname.split('/')[-1][:-4] +
-                         "_t_filtered_transformed.jpg",
-                         transformed_binary_combo)
-            transformed = self.transform(image)
-            mpimg.imsave(out_dir + fname.split('/')[-1][:-4] +
-                         "_t_filtered_lined_transformed.jpg",
-                         transformed)
+            # mpimg.imsave(out_dir + fname.split('/')[-1][:-4] +
+            #              "_t_filtered_transformed.jpg",
+            #              transformed_binary_combo)
+            # transformed = self.transform(image)
+            # mpimg.imsave(out_dir + fname.split('/')[-1][:-4] +
+            #              "_t_filtered_lined_transformed.jpg",
+            #              transformed)
 
         self.meters_per_pixel = np.mean(meters_per_pixel_arr)
         x_offset = 0.5*BirdsEyeTransform.LANE_WIDTH/self.meters_per_pixel
