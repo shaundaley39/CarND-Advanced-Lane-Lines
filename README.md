@@ -34,7 +34,13 @@ This project explores computer vision concepts and tools - using the very practi
 [image13]: ./test_images/test2.jpg
 [image14]: ./intermediate/test2_ctransformed.jpg
 
-[video1]: ./project_video.mp4 "Video"
+[image15]: ./test_images/test5.jpg
+[image16]: ./intermediate/test5_undistorted.jpg
+[image17]: ./output_images/test5_trans.jpg
+[image18]: ./output_images/test5_activated_pixels.jpg
+[image19]: ./output_images/test5_lboxed.jpg
+[image20]: ./output_images/test5_lined.jpg
+[image21]: ./output_images/test5_anotated.jpg
 
 ## [Rubric](https://review.udacity.com/#!/rubrics/1966/view) Points
 
@@ -100,33 +106,56 @@ Raw images | Undistorted and transformed images
 
 ### Pipeline (single images)
 
-Let's run through an example...
+The pipeline for processing and annotating an image frame is implemented in [pipeline.py](pipeline.py).
+
+Let's run through an example of a single image frame going through each stage of the pipeline.
 
 #### 1. Distortion correction
 
-Apply distortion correction
+As outlined above, the first requirement to process an image frame is to correct the image for distortion. That is handled by code in [camera_calibration.py](camera_calibration.py). Here is an example:
+
+Raw image | Distortion-corrected image
+:-------------------------:|:-------------------------:
+![][image15] | ![][image16]
+
 
 #### 2. Birds' eye transform
 
-Apply birds' eye
+The next step in the pipeline is to transform the image to a birds' eye perspective - this is more appropriate for fitting to a lane line model. The code for this is in [birdseye_transform.py](birdseye_transform.py). Here is an example:
+
+Distortion-corrected image | Birds' eye transformed image
+:-------------------------:|:-------------------------:
+![][image16] | ![][image17]
 
 #### 3. Activated pixel extraction
 
-Sobel operators and color spaces.
+The next step in the pipeline is to extract activated pixels likely to belong to lane line markings. The code for this is entirely in [pipeline.py](pipeline.py). Three filters are cominbed in a logical or operation:
+- a Sobel filter (using a custom Sobel operator) in which the x-gradient of grayscale pixels is thresholded in the range [20, 100] \(colored red on the activated pixel image below\)
+- a Sobel filter (using a custom Sobel operator) in which the x-gradient of S values is thresholded in the range [20, 100] \(colored green\)
+- an S filter, in which the frame is converted to the HLS color space, and pixels are activated only where the S value is in the range [170, 255] \(colored blue\)
+
+Birds' eye transformed image | Activated pixels
+:-------------------------:|:-------------------------:
+![][image17] | ![][image18]
 
 
 #### 4. Lane line inference
-- Sliding window lane model with histogram initialization
-- memory and fall-back
-- polynomial fitting
+In the next pipeline step, activated pixels are processed with a sliding window algorithm - some pixels are attributed to the left lane, some are attributed to the right lane and those falling outside a window are discarded entirely. The code for this is in [lane_lines.py](lane_lines.py).
 
-#### 5. Lane curviture and lateral position
+Sliding windows | Inferred lane lines
+:-------------------------:|:-------------------------:
+![][image19] | ![][image20]
 
-Don't lose control.
+
+#### 5. Lane curvature and lateral position
+
+The lane line model in [lane_lines.py](lane_lines.py) also calculates the lane curvature, and the lateral displacement of the vehicle within its lane.
 
 #### 6. Visualizing the output
 
-Let's look at this.
+The frame returned by our pipeline consists of the undistorted input image, annotated with lane line markings, the lane's radius of curvature and our vehicle's displacement within the lane:
+
+![Annotated image][image21]
 
 ---
 
@@ -134,11 +163,15 @@ Let's look at this.
 
 #### 1. A more exciting visualization
 
-First, let's look at the [![project video](https://img.youtube.com/vi/ic2hQlMukNU/0.jpg)](https://www.youtube.com/watch?v=ic2hQlMukNU). Seems pretty good.
+In [pipeline.py](pipeline.py), this same image-by-image processing is applied to each frame in a video feed. The result of this for the project video can be seen here:
+
+[![project video](https://img.youtube.com/vi/ic2hQlMukNU/0.jpg)](https://www.youtube.com/watch?v=ic2hQlMukNU)
 
 ---
 
 ### Discussion
+
+To follow soon...
 
 #### 1. Where did it all go wrong?
 
