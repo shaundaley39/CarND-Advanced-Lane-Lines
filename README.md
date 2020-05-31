@@ -149,7 +149,9 @@ Sliding windows | Inferred lane lines
 
 #### 5. Lane curvature and lateral position
 
-The lane line model in [lane_lines.py](lane_lines.py) also calculates the lane curvature, and the lateral displacement of the vehicle within its lane.
+The lane line model in [lane_lines.py](lane_lines.py) also calculates the lane curvature. This is implemented using the left lane line polynomial only, and uses the meters per pixel value established when the vehicle's birds' eye transform was calculated.
+
+The lateral displacement of the vehicle within its lane is also calculated here - it assumes the camera is mounted centrally on the front of the vehicle.
 
 #### 6. Visualizing the output
 
@@ -161,8 +163,6 @@ The frame returned by our pipeline consists of the undistorted input image, anno
 
 ### Pipeline (video)
 
-#### 1. A more exciting visualization
-
 In [pipeline.py](pipeline.py), this same image-by-image processing is applied to each frame in a video feed. The result of this for the project video can be seen here:
 
 [![project video](https://img.youtube.com/vi/ic2hQlMukNU/0.jpg)](https://www.youtube.com/watch?v=ic2hQlMukNU)
@@ -171,8 +171,12 @@ In [pipeline.py](pipeline.py), this same image-by-image processing is applied to
 
 ### Discussion
 
-To follow soon...
+While this achieved pretty good results with test images and with the project video, this fails with more challenging videos, for a number of reasons:
+- the birds' eye transform makes a flat-world assumption. On hilly road surfaces this does not (even approximately) hold, resulting in a distorted and inaccurate birds' eye view
+- pixel activation is based on thresholding, which is not sufficiently robust to wide variations in sunshine brightness, shading, overpasses/ bridges, road surface color and lane marking colors. In new untrained environments, there will always be a risk that thresholds break down. And it is likely impossible (at very least a major undertaking) to obtain a set of pixel activation thresholds that work well under all environments and conditions.
+- the sliding windows lane line model also has limitations. If there happen to be activated pixels close to a lane marking, the whole model may slide laterally off-track. If lane lines merge or separate (e.g. motorway on-ramps or exits, or narrowing roads), the model will break down. If the vehicle is in the middle of changing lanes, the model will break down. Ideally, a more generic lane model would be robust to all these variations.
 
-#### 1. Where did it all go wrong?
-
-#### 2. Focus for improvement
+A better approach to lane line detection would likely need to improve on all three of these points:
+- robustness to variations in road surface topography
+- an approach to lane line feature extraction that is easier to implement, easier to scale to more environments, which will improve with more data and which will be more robust. Neural networks may be an appropriate tool.
+- a model for lane lines and lane line markings that can represent something close to reality, across most real world situations (lanes merging, lanes separating, lane lines covered in leaves...)
