@@ -5,13 +5,17 @@ from moviepy.editor import *
 import glob
 
 
-movie_glob = '*.mp4'
-imgdir = 'video_images'
+# movie_glob = '*.mp4'
+# imgdir = 'video_images'
+# movie_glob = 'project_video.mp4'
+movie_glob = 'project*.mp4'
+imgdir = 'project_images'
+N = 200
 
 
 def extract_frames(movie, imgdir):
     clip = VideoFileClip(movie)
-    times = [int(i*(clip.duration/10)) for i in range(10)]
+    times = [(i*(clip.duration/N)) for i in range(N)]
     for t in times:
         imgpath = os.path.join(imgdir, movie[:-4] + '-{}.jpg'.format(t))
         clip.save_frame(imgpath, t)
